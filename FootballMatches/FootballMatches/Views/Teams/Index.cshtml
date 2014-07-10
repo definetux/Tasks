@@ -1,0 +1,155 @@
+﻿
+@{
+    ViewBag.Title = "Teams";
+}
+
+@section scripts {
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script type="text/javascript">
+    function selectView(view) {
+        $('.display').not('#' + view + "Display").hide();
+        $('#' + view + "Display").show();
+    }
+    function getData() {
+        $.ajax({
+            type: "GET",
+            url: "/api/TeamsApi/" + '@ViewBag.ParentId',
+            success: function (data) {
+                $('#tableBody').empty();
+                for (var i = 0; i < data.length; i++) {
+                    $('#tableBody').append('<tr><td><input id="id" name="id" type="radio"'
+                    + 'value="' + data[i].TeamId + '" /></td>'
+                    + '<td>' + data[i].Name + '</td>'
+                    + '<td>' + data[i].City + '</td>'
+                    + '<td>' + data[i].Place + '</td></tr>');
+                }
+                $('input:radio')[0].checked = "checked";
+                selectView("summary");
+            }
+        });
+    }
+    $(document).ready(function () {
+        selectView("summary");
+        getData();
+        $("button").click(function (e) {
+            var selectedRadio = $('input:radio:checked');
+            switch (e.target.id) {
+                case "refresh":
+                    getData();
+                    break;
+                case "delete":
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/api/TeamsApi/" + selectedRadio.attr('value'),
+                        success: function (data) {
+                            selectedRadio.closest('tr').remove();
+                        }
+                    });
+                    break;
+                case "add":
+                    selectView("add");
+                    break;
+                case "edit":
+                    {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/TeamsApi/" + '@ViewBag.ParentId' + '?id1=' + selectedRadio.attr('value'),
+                            success: function (data) {
+                                $('#editMatchId').val(data.MatchId);
+                                $('#editTeamId').val(data.TeamId);
+                                $('#editName').val(data.Name);
+                                $('#editCity').val(data.City);
+                                $('#editPlace').val(data.Place);
+                                selectView("edit");
+                            }
+                        });
+                        break;
+                    }
+                case "players":
+
+                    location = "/Players/Index/" + selectedRadio.attr('value');
+
+                    break;
+                case "goals":
+                    location = "/Goals/Index/" + selectedRadio.attr('value');
+                    break;
+                case "submitEdit":
+                    $.ajax({
+                        type: "PUT",
+                        url: "/api/TeamsApi/" + '@ViewBag.ParentId' + '?id1=' + selectedRadio.attr('value'),
+                        data: $('#editForm').serialize(),
+                        success: function (result) {
+                            var cells = selectedRadio.closest('tr').children();
+                            cells[1].innerText = $('#editName').val();
+                            cells[2].innerText = $('#editCity').val();
+                            cells[3].innerText = $('#editPlace').val();
+                            selectView("summary");
+                        }
+                    });
+                    break;
+            }
+        });
+    });
+
+</script>
+}
+
+
+
+<div id="summaryDisplay" class="display">
+    <h4>Teams</h4>
+    <table>
+        <thead>
+            <tr>
+                <th class="selectCol"></th>
+                <th class="nameCol">Name</th>
+                <th class="cityCol">City</th>
+                <th class="placeCol">Place</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="3">The data is loading</td></tr>
+        </tbody>
+    </table>
+    <div id="buttonContainer">
+        <button id="refresh">Refresh</button>
+        <button id="add">Add</button>
+        <button id="edit">Edit</button>
+        <button id="delete">Delete</button>
+        <button id="goals">Show Goals</button>
+        <button id="players">Show Players</button>
+    </div>
+</div>
+
+<div id="addDisplay" class="display">
+    <h4>Add New Team</h4>
+    @{
+        AjaxOptions addAjaxOpts = new AjaxOptions()
+        {
+            OnSuccess = "getData",
+            Url = "/api/TeamsApi/" + ViewBag.ParentId
+        };
+    }
+    @using (Ajax.BeginForm(addAjaxOpts))
+    {
+        @Html.Hidden("MatchId", (int)ViewBag.ParentId)
+        @Html.Hidden("TeamId", 0);
+        <p><label>Name:</label>@Html.Editor("Name")</p>
+        <p><label>City:</label>@Html.Editor("City")</p>
+        <p><label>Place:</label>@Html.Editor("Place")</p>
+        <button type="submit">Submit</button>
+    }
+</div>
+
+<div id="editDisplay" class="display">
+    <h4>Edit Team</h4>
+    <form id="editForm">
+        <input id="editMatchId" type="hidden" name="MatchId" />
+        <input id="editTeamId" type="hidden" name="TeamId" />
+        <p><label>Name:</label><input id="editName" name="Name" /></p>
+        <p><label>City:</label><input id="editCity" name="City" /></p>
+        <p><label>Place:</label><input id="editPlace" name="Place" /></p>
+    </form>
+    <button id="submitEdit" type="submit">Save</button>
+</div>
+

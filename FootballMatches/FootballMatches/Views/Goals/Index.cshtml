@@ -1,0 +1,143 @@
+﻿
+@{
+    ViewBag.Title = "Goals";
+}
+
+@section scripts {
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script type="text/javascript">
+    function selectView(view) {
+        $('.display').not('#' + view + "Display").hide();
+        $('#' + view + "Display").show();
+    }
+    function getData() {
+        $.ajax({
+            type: "GET",
+            url: "/api/GoalsApi/" + '@ViewBag.ParentId',
+            success: function (data) {
+                $('#tableBody').empty();
+                for (var i = 0; i < data.length; i++) {
+                    $('#tableBody').append('<tr><td><input id="id" name="id" type="radio"'
+                    + 'value="' + data[i].GoalId + '" /></td>'
+                    + '<td>' + data[i].LastName + '</td>'
+                    + '<td>' + data[i].Minute + '</td></tr>');
+                }
+                $('input:radio')[0].checked = "checked";
+                selectView("summary");
+            }
+        });
+    }
+    $(document).ready(function () {
+        selectView("summary");
+        getData();
+        $("button").click(function (e) {
+            var selectedRadio = $('input:radio:checked');
+            switch (e.target.id) {
+                case "refresh":
+                    getData();
+                    break;
+                case "delete":
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/api/GoalsApi/" + selectedRadio.attr('value'),
+                        success: function (data) {
+                            selectedRadio.closest('tr').remove();
+                        }
+                    });
+                    break;
+                case "add":
+                    selectView("add");
+                    break;
+                case "edit":
+                    {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/GoalsApi/" + '@ViewBag.ParentId' + '?id1=' + selectedRadio.attr('value'),
+                            success: function (data) {
+                                $('#editTeamId').val(data.TeamId);
+                                $('#editGoalId').val(data.GoalId);
+                                $('#editLastName').val(data.LastName);
+                                $('#editMinute').val(data.Minute);
+                                selectView("edit");
+                            }
+                        });
+                        break;
+                    }
+                case "submitEdit":
+                    $.ajax({
+                        type: "PUT",
+                        url: "/api/GoalsApi/" + '@ViewBag.ParentId' + '?id1=' + selectedRadio.attr('value'),
+                        data: $('#editForm').serialize(),
+                        success: function (result) {
+                            var cells = selectedRadio.closest('tr').children();
+                            cells[1].innerText = $('#editLastName').val();
+                            cells[2].innerText = $('#editMinute').val();
+                            selectView("summary");
+                        }
+                    });
+                    break;
+            }
+        });
+    });
+
+    </script>
+}
+
+
+
+<div id="summaryDisplay" class="display">
+    <h4>Players</h4>
+    <table>
+        <thead>
+            <tr>
+                <th class="selectCol"></th>
+                <th class="nameCol">Last Name</th>
+                <th class="nameCol">Minute</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="3">The data is loading</td></tr>
+        </tbody>
+    </table>
+    <div id="buttonContainer">
+        <button id="refresh">Refresh</button>
+        <button id="add">Add</button>
+        <button id="edit">Edit</button>
+        <button id="delete">Delete</button>
+    </div>
+</div>
+
+<div id="addDisplay" class="display">
+    <h4>Add New Goal</h4>
+    @{
+        AjaxOptions addAjaxOpts = new AjaxOptions()
+        {
+            OnSuccess = "getData",
+            Url = "/api/GoalsApi/" + ViewBag.ParentId
+        };
+    }
+    @using (Ajax.BeginForm(addAjaxOpts))
+    {
+        @Html.Hidden("TeamId", (int)ViewBag.ParentId)
+        @Html.Hidden("GoalId", 0);
+        <p><label>Last Name:</label>@Html.Editor("LastName")</p>
+        <p><label>Minute:</label>@Html.Editor("Minute")</p>
+        <button type="submit">Submit</button>
+    }
+</div>
+
+<div id="editDisplay" class="display">
+    <h4>Edit Team</h4>
+    <form id="editForm">
+        <input id="editTeamId" type="hidden" name="TeamId" />
+        <input id="editGoalId" type="hidden" name="GoalId" />
+        <p><label>Last Name:</label><input id="editLastName" name="LastName" /></p>
+        <p><label>Minute:</label><input id="editMinute" name="Minute" /></p>
+    </form>
+    <button id="submitEdit" type="submit">Save</button>
+</div>
+
+
+
+
+

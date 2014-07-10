@@ -1,0 +1,153 @@
+﻿
+@{
+    ViewBag.Title = "Players";
+}
+
+@section scripts {
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script type="text/javascript">
+    function selectView(view) {
+        $('.display').not('#' + view + "Display").hide();
+        $('#' + view + "Display").show();
+    }
+    function getData() {
+        $.ajax({
+            type: "GET",
+            url: "/api/PlayersApi/" + '@ViewBag.ParentId',
+            success: function (data) {
+                $('#tableBody').empty();
+                for (var i = 0; i < data.length; i++) {
+                    $('#tableBody').append('<tr><td><input id="id" name="id" type="radio"'
+                    + 'value="' + data[i].PlayerId + '" /></td>'
+                    + '<td>' + data[i].LastName + '</td>'
+                    + '<td>' + data[i].FirstName + '</td>'
+                    + '<td>' + data[i].Number + '</td>'
+                    + '<td>' + data[i].Position + '</td></tr>');
+                }
+                $('input:radio')[0].checked = "checked";
+                selectView("summary");
+            }
+        });
+    }
+    $(document).ready(function () {
+        selectView("summary");
+        getData();
+        $("button").click(function (e) {
+            var selectedRadio = $('input:radio:checked');
+            switch (e.target.id) {
+                case "refresh":
+                    getData();
+                    break;
+                case "delete":
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/api/PlayersApi/" + selectedRadio.attr('value'),
+                        success: function (data) {
+                            selectedRadio.closest('tr').remove();
+                        }
+                    });
+                    break;
+                case "add":
+                    selectView("add");
+                    break;
+                case "edit":
+                    {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/PlayersApi/" + '@ViewBag.ParentId' + '?id1=' + selectedRadio.attr('value'),
+                            success: function (data) {
+                                $('#editTeamId').val(data.TeamId);
+                                $('#editPlayerId').val(data.PlayerId);
+                                $('#editLastName').val(data.LastName);
+                                $('#editFirstName').val(data.FirstName);
+                                $('#editNumber').val(data.Number);
+                                $('#editPosition').val(data.Position);
+                                selectView("edit");
+                            }
+                        });
+                        break;
+                    }
+                case "submitEdit":
+                    $.ajax({
+                        type: "PUT",
+                        url: "/api/PlayersApi/" + '@ViewBag.ParentId' + '?id1=' + selectedRadio.attr('value'),
+                        data: $('#editForm').serialize(),
+                        success: function (result) {
+                            var cells = selectedRadio.closest('tr').children();
+                            cells[1].innerText = $('#editLastName').val();
+                            cells[2].innerText = $('#editFirstName').val();
+                            cells[3].innerText = $('#editNumber').val();
+                            cells[4].innerText = $('#editPosition').val();
+                            selectView("summary");
+                        }
+                    });
+                    break;
+            }
+        });
+    });
+
+    </script>
+}
+
+
+
+<div id="summaryDisplay" class="display">
+    <h4>Players</h4>
+    <table>
+        <thead>
+            <tr>
+                <th class="selectCol"></th>
+                <th class="nameCol">Last Name</th>
+                <th class="nameCol">First Name</th>
+                <th class="cityCol">Number</th>
+                <th class="placeCol">Position</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="3">The data is loading</td></tr>
+        </tbody>
+    </table>
+    <div id="buttonContainer">
+        <button id="refresh">Refresh</button>
+        <button id="add">Add</button>
+        <button id="edit">Edit</button>
+        <button id="delete">Delete</button>
+    </div>
+</div>
+
+<div id="addDisplay" class="display">
+    <h4>Add New Player</h4>
+    @{
+        AjaxOptions addAjaxOpts = new AjaxOptions()
+        {
+            OnSuccess = "getData",
+            Url = "/api/PlayersApi/" + ViewBag.ParentId
+        };
+    }
+    @using (Ajax.BeginForm(addAjaxOpts))
+    {
+        @Html.Hidden("TeamId", (int)ViewBag.ParentId)
+        @Html.Hidden("PlayerId", 0);
+        <p><label>Last Name:</label>@Html.Editor("LastName")</p>
+        <p><label>First Name:</label>@Html.Editor("FirstName")</p>
+        <p><label>Number:</label>@Html.Editor("Number")</p>
+        <p><label>Position:</label>@Html.Editor("Position")</p>
+        <button type="submit">Submit</button>
+    }
+</div>
+
+<div id="editDisplay" class="display">
+    <h4>Edit Team</h4>
+    <form id="editForm">
+        <input id="editTeamId" type="hidden" name="TeamId" />
+        <input id="editPlayerId" type="hidden" name="PlayerId" />
+        <p><label>Last Name:</label><input id="editLastName" name="LastName" /></p>
+        <p><label>First Name:</label><input id="editFirstName" name="FirstName" /></p>
+        <p><label>Number:</label><input id="editNumber" name="Number" /></p>
+        <p><label>Position:</label><input id="editPosition" name="Position" /></p>
+    </form>
+    <button id="submitEdit" type="submit">Save</button>
+</div>
+
+
+

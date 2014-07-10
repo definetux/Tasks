@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Matches";
+}
+
+@section scripts {
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/Home/Index.js"></script>
+}
+
+<div id="summaryDisplay" class="display">
+    <h4>Matches</h4>
+    <table>
+        <thead>
+            <tr>
+                <th class="selectCol"></th>
+                <th class="cityCol">City</th>
+                <th class="stadCol">Stadium</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="3">The data is loading</td></tr>
+        </tbody>
+    </table>
+    <div id="buttonContainer">
+        <button id="refresh">Refresh</button>
+        <button id="add">Add</button>
+        <button id="edit">Edit</button>
+        <button id="delete">Delete</button>
+        <button id="teams">Show teams</button>
+    </div>
+</div>
+
+<div id="addDisplay" class="display">
+    <h4>Add New Match</h4>
+    @{
+        AjaxOptions addAjaxOpts = new AjaxOptions
+        {
+            OnSuccess = "getData",
+            Url = "/api/MatchesApi"
+        };
+    }
+    @using (Ajax.BeginForm(addAjaxOpts))
+    {
+        @Html.Hidden("MatchId", 0)
+        <p><label>City:</label>@Html.Editor("City")</p>
+        <p><label>Stadium:</label>@Html.Editor("Stadium")</p>
+        <button type="submit">Submit</button>
+    }
+</div>
+
+<div id="editDisplay" class="display">
+    <h4>Edit Match</h4>
+    <form id="editForm">
+        <input id="editMatchId" type="hidden" name="MatchId" />
+        <p><label>City:</label><input id="editCity" name="City" /></p>
+        <p><label>Stadium:</label><input id="editStadium" name="Stadium" /></p>
+    </form>
+    <button id="submitEdit" type="submit">Save</button>
+</div>
