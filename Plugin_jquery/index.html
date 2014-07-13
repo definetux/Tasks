@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Create plugin for jQuery</title>
+    <script type="text/javascript" src ="src/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="src/plugin.js"></script>
+</head>
+<style>
+    div {
+        margin : 10px;
+        float : left;
+    }
+</style>
+<body>
+    <div id="container1">
+    </div>
+    <div id="container2">
+    </div>
+    <div id="container3">
+    </div>
+    <div id="container4">
+    </div>
+
+    <script type="text/javascript">
+        // Пример множества сообщений
+        var messageMap1 = [{
+            id : 1,
+            message : "First message"
+        },{
+            id : 2,
+            message : "Second message"
+        }, {
+            id : 7,
+            message : "Last message in First map"
+        }
+        ];
+
+        var messageMap2 = [{
+            id : 3,
+            message : "Third message"
+        },{
+            id : 4,
+            message : "Fourth message"
+        }, {
+            id : 8,
+            message : "Last message in Second map"
+        }
+        ];
+
+        var messageMap3 = [{
+            id : 5,
+            message : "Fifth message"
+        },{
+            id : 6,
+            message : "Sixth message"
+        }, {
+            id : 9,
+            message : "Last message in Third map"
+        }
+        ];
+
+        // Контейнеры между собой не взаимодействуют, поэтому можно передавать один словарь в разные контейнеры
+        $('#container1').messanger(messageMap1);
+        $('#container2').messanger(messageMap2);
+        $('#container3').messanger(messageMap3);
+        $('#container4').messanger(messageMap1);
+
+        // Создал кнопки отдельно от плагина, т.к. по условию задания плагин,
+        // должен предоставлять только функции для работы с контейнером,
+        // а кто будет выполнять эти функции - задача клиента
+        $('div').each( function() {
+            var $container = $(this);
+            var $btn_show = $("<button> Show message</button>"),
+                $btn_hide = $("<button> Hide message </button>"),
+                $btn_clean = $("<button> Clean message </button>");
+
+            $btn_show.click( function() { $container.messanger("show") });
+            $btn_hide.click( function() { $container.messanger("hide") });
+            $btn_clean.click( function() { $container.messanger("clean") });
+
+            $(this).append($btn_show);
+            $(this).append($btn_hide);
+            $(this).append($btn_clean);
+        })
+    </script>
+</body>
+</html>
