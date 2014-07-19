@@ -164,6 +164,7 @@
     <Compile Include="Controllers\PlayersController.cs" />
     <Compile Include="Controllers\TeamsApiController.cs" />
     <Compile Include="Controllers\TeamsController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
