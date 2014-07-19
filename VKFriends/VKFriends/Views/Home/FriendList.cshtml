@@ -1,0 +1,47 @@
+﻿@model IEnumerable<VKFriends.Models.Concrete.Friend>
+
+@{
+    ViewBag.Title = "FriendList";
+}
+
+<h2>FriendList: @ViewBag.FriendsCount</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.first_name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.last_name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.domain)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.online)
+        </th>
+    </tr>
+
+    @{
+        if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.first_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.last_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.domain)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.online)
+                    </td>
+                </tr>
+            }
+        }
+    }
+</table>

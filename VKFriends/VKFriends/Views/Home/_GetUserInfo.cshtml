@@ -1,0 +1,9 @@
+﻿@model VKFriends.Models.Concrete.UserInfo
+
+@{
+    if (Model != null)
+    {
+        <h1>Hello, @Model.first_name @Model.last_name</h1>
+        <img src="@Model.photo_100" alt="Your photo" width="130" />
+    }
+}

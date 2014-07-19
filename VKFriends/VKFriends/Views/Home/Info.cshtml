@@ -1,0 +1,13 @@
+﻿@model String
+
+@{
+    ViewBag.Title = "User";
+}
+
+<div id="userInfo">
+    @Html.Action("_GetUserInfo", "Home", new { id = ViewBag.UserId })
+</div>
+
+<div style="margin-top:10px;">
+    <a class="btn btn-primary" type="button" href="@Url.Action("FriendList")">Show friend's list</a>
+</div>
