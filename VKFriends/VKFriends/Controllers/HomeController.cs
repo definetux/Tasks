@@ -133,7 +133,7 @@ namespace VKFriends.Controllers
             return string.Format("https://oauth.vk.com/access_token?" +
                                     "client_id={0}&" +
                                     "client_secret={1}&" +
-                                    "code={2}&redirect_uri=http://localhost:34237/Home/CurrentUser", clientId, clientSecret, code);
+                                    "code={2}&redirect_uri=http://kirill.com/oauth/Home/CurrentUser", clientId, clientSecret, code);
         }
 
         private string GetFriendsUrl(string userId, string accessToken)
@@ -155,7 +155,7 @@ namespace VKFriends.Controllers
         private string GetLoginUrl(string clientId, string scope)
         {
             return String.Format(
-                @"https://oauth.vk.com/authorize?client_id={0}&scope={1}&redirect_uri=http://localhost:34237/Home/CurrentUser&response_type=code&v=5.23",
+                @"https://oauth.vk.com/authorize?client_id={0}&scope={1}&redirect_uri=http://kirill.com/oauth/Home/CurrentUser&response_type=code&v=5.23",
                 clientId, scope);
         }
 
