@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="Pollination" namespace="Pollination.Domain.Concrete">
+  <class name="Bee" table="Bees">
+    <id name="Id">
+      <generator class="native"/>
+    </id>
+    <component name="Name" class="ComplexName">
+      <property name="FirstName"/>
+      <property name="LastName"/>
+      <property name="Nick"/>
+    </component>
+    <property name="Role" type="BeeRoleType" />
+    <many-to-one name="Beehive" column="BeehiveID" />
+    <set name="Plants" table="BeePlantRef" inverse="true" cascade="all-delete-orphan">
+      <key column="BeeId" />
+      <many-to-many column="PlantId" class="Plant" />
+    </set>
+  </class>
+</hibernate-mapping>

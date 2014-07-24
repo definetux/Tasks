@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="Pollination" namespace="Pollination.Domain.Concrete">
+  <class name="Plant" table="Plants">
+    <id name="Id">
+      <generator class="native"/>
+    </id>
+    <property name="HoneyPerDusting" />
+    <property name="Name" />
+    <property name="PlantType" type="PlantsType" />
+    <set name="Bees" table="BeePlantRef" cascade="all-delete-orphan">
+      <key column="PlantId" />
+      <many-to-many column="BeeId" class="Bee" />
+    </set>
+  </class>
+</hibernate-mapping>

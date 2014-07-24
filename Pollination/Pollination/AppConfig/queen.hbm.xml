@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="Pollination" namespace="Pollination.Domain.Concrete">
+  <class name="Queen" table="Queens">
+    <id name="Id">
+      <generator class="native"/>
+    </id>
+    <property name="IQ"/>
+    <component name="Name" class="ComplexName">
+      <property name="FirstName"/>
+      <property name="LastName"/>
+      <property name="Nick"/>
+    </component>
+    <one-to-one name="Beehive" class="Beehive" />
+  </class>
+</hibernate-mapping>
