@@ -6,7 +6,7 @@
 
         public int Capacity { get; set; }
 
-        public string Address { get; set; }
+        public string QueenName { get; set; }
 
         public int QueenIQ { get; set; }
 

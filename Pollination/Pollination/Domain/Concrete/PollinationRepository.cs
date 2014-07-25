@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Linq;
+using NHibernate.Mapping;
+using NHibernate.Util;
 using Pollination.Domain.Interfaces;
 
 namespace Pollination.Domain.Concrete
@@ -294,16 +298,42 @@ namespace Pollination.Domain.Concrete
             {
                 using (var transact = session.BeginTransaction())
                 {
-                    var result = session.Query<Beehive>().ToList();
+                    // Вариант на SQL, NHProfiler так же выдает предупреждения
+                    // по поводу нескольких JOIN, но в отличии от второго варианта
+                    // выполняет один запрос к БД, и проблема с подсчетом количества пчел в улье
+                    //const string query = "SELECT TOP(3) Bh.Name AS BeehiveName, Bh.Capacity AS Capacity, Q.FIrstName AS QueenName, Q.IQ AS QueenIQ, SUM(p.HoneyPerDusting) AS HoneySum "
+                    //                     + "FROM Beehives Bh "
+                    //                     + "LEFT JOIN Queens Q ON q.Id = Bh.QueenID "
+                    //                     + "INNER JOIN Bees Bee ON Bee.BeehiveID = Bh.Id "
+                    //                     + "INNER JOIN BeePlantRef bpr ON Bee.Id = bpr.BeeId "
+                    //                     + "INNER JOIN Plants p ON bpr.PlantId = p.Id "
+                    //                     + "GROUP BY Bh.Name, Bh.Capacity, Q.FIrstName, Q.IQ "
+                    //                     + "ORDER BY HoneySum DESC";
+
+                    //var result = session.CreateSQLQuery(query).List();
+
+                    //foreach (var res in result)
+                    //{
+                    //    var item = (System.Object[]) res;
+                    //    beehiveStatistics.Add( new BeehiveStatistic
+                    //    {
+                    //        BeehiveName = item[0].ToString(),
+                    //        Capacity = (int)item[1],
+                    //        QueenName = item[2].ToString(),
+                    //        QueenIQ = (int)item[3],
+                    //        HoneySum = (int)item[4]
+                    //    });
+                    //}
 
                     // Не оптимизированная выборка,
                     // Пытался выполнить это в Query<T>, вложенныe методы Sum выдают ошибку
+                    var result = session.Query<Beehive>().ToList();
+
                     beehiveStatistics = (
                         from res in result
                         select new BeehiveStatistic
                         {
                             BeehiveName = res.Name,
-                            Address = res.Address.ToString(),
                             Capacity = res.Capacity,
                             QueenIQ = (res.Queen != null) ? res.Queen.IQ : 0,
                             BeesCount = res.Bees.Count,

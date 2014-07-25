@@ -58,8 +58,8 @@ namespace Pollination
             var beehiveStatistics = repo.GetTopBeehives();
             foreach (var beehive in beehiveStatistics)
             {
-                Console.WriteLine("Beehive: {0}, Queen IQ: {1}, Capacity: {2}\n Address: {3},\n Count of bees: {4}, Sum of Honey: {5}",
-                    beehive.BeehiveName, beehive.QueenIQ, beehive.Capacity, beehive.Address, beehive.BeesCount, beehive.HoneySum);
+                Console.WriteLine("Beehive: {0},\n \tQueen Name: {1},\n\tQueen IQ: {2},\n\tCapacity: {3}\n\tCount of bees: {4},\n\tSum of Honey: {5}",
+                    beehive.BeehiveName, beehive.QueenName, beehive.QueenIQ, beehive.Capacity, beehive.BeesCount, beehive.HoneySum);
             }
             Console.WriteLine("=====================\n");
 
